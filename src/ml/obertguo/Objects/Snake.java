@@ -11,7 +11,8 @@ public class Snake {
     private final int gameHeight;
     private final Console console;
 
-    //Snake is based on a singly linked list
+    //Snake is based on a singly linked list.
+    //An array would either require copying each time or allocating a large block of memory
     private Node head;
     private Node tail;
     private Direction currentDirection;

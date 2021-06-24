@@ -17,7 +17,7 @@ abstract class AbstractGameObject {
     protected final int objectHeight;
     protected final Console console;
 
-    private final int spawnOffset = 60;
+    private final int spawnOffset = 50;
 
     private final int gameWidth;
     private final int gameHeight;

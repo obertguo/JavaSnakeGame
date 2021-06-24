@@ -21,33 +21,34 @@ Updates:
 11 June 2021
     Added code documentation and refactored code by including a types folder to contain distinct custom data types
 
+23 June 2021
+    Added easy, medium, and hard difficulty settings
+
 Sources used for the project:
 Comparing objects in a HashSet: https://stackoverflow.com/questions/53438370/comparing-objects-in-hashset
 HashSet: https://www.geeksforgeeks.org/hashset-in-java/
 Abstract class: https://www.w3schools.com/java/java_abstract.asp
 Javadoc: https://www.tutorialspoint.com/java/java_documentation.htm
-
-TODO:
-    -Inculde an options menu to change various game settings (e.g., speed, num obstacles, num food)
-        or include levels such as easy, medium, and hard
  */
 
 package ml.obertguo;
 import hsa_ufa.Console;
+import ml.obertguo.Types.Difficulty;
 import ml.obertguo.Views.GameOverWindow;
 import ml.obertguo.Views.GameWindow;
 import ml.obertguo.Views.WelcomeWindow;
 import java.awt.*;
 
 public class Main {
-    private static final int GAMEWIDTH = 460;
-    private static final int GAMEHEIGHT = 460;
+    private static final int GAMEWIDTH = 700;
+    private static final int GAMEHEIGHT = 700;
     private static final int FONTSIZE = 16;
 
-    private static final int GAMEDELAYMS = 50;
+    private static int GAMEDELAYMS;
     private static final int DELAYSTARTMS = 500;
 
     private static boolean gameOver = false;
+    private static Difficulty difficulty;
 
     public static void main(String[] args) throws InterruptedException{
         //Initialize console.
@@ -57,14 +58,15 @@ public class Main {
 
         WelcomeWindow welcomeWindow = new WelcomeWindow(console);
         String name = welcomeWindow.askName();
-        welcomeWindow.displayRulesAndOptions(name);
+        difficulty = welcomeWindow.selectDifficulty();
+        welcomeWindow.displayRules(name);
 
-        GameWindow gameWindow = new GameWindow(console);
+        GameWindow gameWindow = new GameWindow(console, difficulty);
+        GAMEDELAYMS = Factory.generateGameDelayMS(difficulty);
 
         //Add a slight delay so that user is ready
         Thread.sleep(DELAYSTARTMS);
 
-        //Game loop (repetition structure - while loop)
         while(true){
             gameWindow.processInput();
             gameWindow.updateGame();
@@ -79,8 +81,14 @@ public class Main {
                 gameOverWindow.display();
 
                 if(gameOverWindow.playAgain()){
+                    //Allow user to change difficulty
+                    difficulty = welcomeWindow.selectDifficulty();
+
+                    //Update game delay to reflect difficulty chosen
+                    GAMEDELAYMS = Factory.generateGameDelayMS(difficulty);
+
                     //Re-initialize game (restart) by assigning gameWindow to a new GameWindow reference
-                    gameWindow = new GameWindow(console);
+                    gameWindow = new GameWindow(console, difficulty);
 
                     //Add a slight delay so that user is ready
                     Thread.sleep(DELAYSTARTMS);
@@ -98,14 +106,7 @@ public class Main {
     public static void drawCheckeredBackground(Console console){
         //Size of each grid square
         final int size = 80;
-
-        Color[] colors = {
-                //Green color with opacity
-                new Color(238, 238, 210, 100),
-
-                //Slightly white color with opacity
-                new Color(186, 202, 68, 100)
-        };
+        Color[] colors = Factory.generateColor(difficulty);
 
         int rowColor = 0; //An index that keeps track of the next row color to alternate to
         int colColor; //An index that keeps track of the next column color to alternate to

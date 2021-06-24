@@ -1,10 +1,12 @@
 package ml.obertguo.Views;
 import hsa_ufa.Console;
+import ml.obertguo.Factory;
 import ml.obertguo.Objects.Food;
 import ml.obertguo.Main;
 import ml.obertguo.Objects.Obstacle;
 import ml.obertguo.Objects.Snake;
 import ml.obertguo.Types.Coordinate;
+import ml.obertguo.Types.Difficulty;
 import ml.obertguo.Types.Direction;
 import java.awt.*;
 import java.util.HashSet;
@@ -15,11 +17,11 @@ public class GameWindow {
 
     private static final int FOODWIDTH = 10;
     private static final int FOODHEIGHT = 10;
-    private static final int NUMFOOD = 3;
+    private static int NUMFOOD;
 
     private static final int OBSTACLEWIDTH = 20;
     private static final int OBSTACLEHEIGHT = 20;
-    private static final int NUMOBSTACLES = 10;
+    private static int NUMOBSTACLES;
 
     private final Snake snake;
     private final Food[] foods;
@@ -34,10 +36,13 @@ public class GameWindow {
      * Constructor to initialize game objects
      * @param console A reference to an already initialized HSA_UFA console
      */
-    public GameWindow(Console console){
+    public GameWindow(Console console, Difficulty difficulty){
         this.console = console;
         console.setBackgroundColor(Color.BLACK);
         console.clear();
+
+        NUMOBSTACLES = Factory.generateNumObstacles(difficulty);
+        NUMFOOD = Factory.generateNumFood(difficulty);
 
         //Initialize new snake, and create foods + obstacles
         this.snake = new Snake(console, SNAKEWIDTH, SNAKEHEIGHT);
@@ -50,7 +55,8 @@ public class GameWindow {
         this.foods = new Food[NUMFOOD];
 
         //Initialize snake body (repetition structure - for loop)
-        for(int i = 0; i < 10; ++i) snake.grow();
+        for(int i = 0; i < 10; ++i)
+            snake.grow();
 
         //Generate obstacles
         for(int i = 0; i < NUMOBSTACLES; ++i){
@@ -129,7 +135,8 @@ public class GameWindow {
     public void updateGame(){
         snake.move();
 
-        for(int i = 0; i < obstacles.length; ++i) obstacles[i].move();
+        for(int i = 0; i < obstacles.length; ++i)
+            obstacles[i].move();
     }
 
     /**
@@ -139,8 +146,10 @@ public class GameWindow {
      */
     public boolean checkObstacleCollision(){
         //Iterate over obstacles to check if a collision has occurred
-        for(int i = 0; i < obstacles.length; ++i)
-            if(obstacles[i].checkCollision(snake)) return true;
+        for(int i = 0; i < obstacles.length; ++i){
+            if(obstacles[i].checkCollision(snake))
+                return true;
+        }
 
         return false;
     }
@@ -171,7 +180,8 @@ public class GameWindow {
                 foods[i].generate(objectsSet, snake);
 
                 //Generate new obstacle layout
-                for(int j = 0; j < obstacles.length; ++j) obstacles[j].generate(objectsSet, snake);
+                for(int j = 0; j < obstacles.length; ++j)
+                    obstacles[j].generate(objectsSet, snake);
             }
         }
     }
